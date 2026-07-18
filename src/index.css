@@ -798,3 +798,37 @@ tbody td { padding: 14px 16px; font-size: 0.875rem; color: var(--text-primary); 
 .coins-input-wrapper .form-input { padding-left: 32px; }
 .coins-input-wrapper .coins-symbol { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #fbbf24; font-size: 0.9rem; }
 
+
+/* Merchant Specific Styles */
+.qr-card {
+  position: relative;
+}
+
+.qr-glow-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(99,102,241,0.4) 0%, rgba(99,102,241,0) 70%);
+  filter: blur(40px);
+  z-index: 0;
+  animation: pulse-glow 4s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-item:hover {
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  cursor: default;
+}

@@ -1,12 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Transactions from './pages/Transactions';
+import Settings from './pages/Settings';
+import Sidebar from './components/Sidebar';
+import { FiMenu } from 'react-icons/fi';
 import './index.css';
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (loading) {
     return (
@@ -19,11 +25,27 @@ function ProtectedLayout() {
   if (!user || user.role !== 'merchant') return <Navigate to="/login" replace />;
 
   return (
-    <div className="app-layout" style={{ display: 'block', minHeight: '100vh', padding: '20px' }}>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+    <div className="app-layout">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      
+      <main className="main-content">
+        <header className="mobile-header">
+          <button className="btn btn-icon btn-ghost" onClick={() => setSidebarOpen(true)}>
+            <FiMenu />
+          </button>
+          <div style={{ fontWeight: 600 }}>Merchant Panel</div>
+          <div style={{ width: 40 }}></div>
+        </header>
+
+        <div className="content-container">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </main>
     </div>
   );
 }

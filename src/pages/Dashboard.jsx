@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { useAuth } from '../context/AuthContext';
 import { QRCodeSVG } from 'qrcode.react';
-import { FiLogOut, FiDollarSign, FiClock } from 'react-icons/fi';
+import { FiDollarSign, FiClock, FiDownload, FiShare2 } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
   const [stats, setStats] = useState({ totalCoins: 0, todayCoins: 0, paymentCount: 0 });
-  const [payments, setPayments] = useState([]);
+  const [recentPayments, setRecentPayments] = useState([]);
   const [qrData, setQrData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +23,7 @@ export default function Dashboard() {
         api.get('/merchants/qr')
       ]);
       setStats(dashRes.data.stats);
-      setPayments(dashRes.data.payments);
+      setRecentPayments(dashRes.data.payments.slice(0, 5)); // show only top 5 here
       setQrData(qrRes.data);
     } catch (error) {
       toast.error('Failed to load dashboard data');
@@ -35,7 +34,7 @@ export default function Dashboard() {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric',
+      day: '2-digit', month: 'short',
       hour: '2-digit', minute: '2-digit'
     });
   };
@@ -43,34 +42,44 @@ export default function Dashboard() {
   if (loading) return <div className="loading-center"><div className="spinner" /></div>;
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+    <div className="page-header" style={{ padding: '0 20px 40px 20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="flex-between align-center" style={{ marginBottom: 32 }}>
         <div>
-          <h1 style={{ margin: 0, color: 'var(--text-primary)' }}>Merchant Dashboard</h1>
-          <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Welcome, {user?.name} ({user?.shopName})</p>
+          <h1 className="page-title">Dashboard Overview</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Welcome back to your store!</p>
         </div>
-        <button onClick={logout} className="btn btn-secondary">
-          <FiLogOut style={{ marginRight: 8 }} /> Logout
-        </button>
-      </header>
+      </div>
 
-      <div className="grid">
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px 20px' }}>
-          <h3 style={{ margin: '0 0 16px 0', color: 'var(--text-primary)' }}>Your Payment QR Code</h3>
+      <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+        
+        {/* Left Column: QR Code */}
+        <div className="card glassmorphism qr-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '40px 20px', position: 'relative', overflow: 'hidden' }}>
+          <div className="qr-glow-bg"></div>
+          <h3 style={{ margin: '0 0 24px 0', color: 'var(--text-primary)', zIndex: 1 }}>Your Payment QR Code</h3>
           {qrData?.qrData ? (
-            <div style={{ background: '#fff', padding: 16, borderRadius: 16, marginBottom: 16 }}>
-              <QRCodeSVG value={`merchant:${qrData.qrData}`} size={200} />
+            <div style={{ background: '#fff', padding: 24, borderRadius: 24, marginBottom: 24, boxShadow: '0 10px 40px rgba(99, 102, 241, 0.2)', zIndex: 1 }}>
+              <QRCodeSVG value={`merchant:${qrData.qrData}`} size={220} />
             </div>
           ) : (
             <p>QR Code not available</p>
           )}
-          <p style={{ color: 'var(--text-secondary)', margin: 0 }}>Scan to pay {qrData?.shopName}</p>
+          <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '1.1rem', zIndex: 1 }}>Scan to pay <strong>{qrData?.shopName}</strong></p>
+          
+          <div style={{ display: 'flex', gap: '16px', marginTop: '24px', zIndex: 1 }}>
+            <button className="btn btn-secondary" style={{ borderRadius: '20px' }}>
+              <FiDownload /> Download
+            </button>
+            <button className="btn btn-primary" style={{ borderRadius: '20px' }}>
+              <FiShare2 /> Share QR
+            </button>
+          </div>
         </div>
 
+        {/* Right Column: Stats & Recent Tx */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--accent-primary)' }}>
+          <div className="stats-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div className="stat-card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(30,30,40,1) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+              <div className="stat-icon" style={{ background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-primary)' }}>
                 <FiDollarSign />
               </div>
               <div className="stat-info">
@@ -78,8 +87,9 @@ export default function Dashboard() {
                 <h3 className="stat-value">{stats.totalCoins} <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-secondary)' }}>Coins</span></h3>
               </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-green)' }}>
+            
+            <div className="stat-card" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(30,30,40,1) 100%)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+              <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.2)', color: 'var(--accent-green)' }}>
                 <FiClock />
               </div>
               <div className="stat-info">
@@ -89,37 +99,35 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="card" style={{ flex: 1 }}>
-            <h3 style={{ marginTop: 0, marginBottom: 16, color: 'var(--text-primary)' }}>Recent Transactions</h3>
-            {payments.length === 0 ? (
-              <div className="empty-state">
-                <p>No transactions yet.</p>
+          <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div className="flex-between align-center" style={{ marginBottom: 16 }}>
+              <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>Recent Transactions</h3>
+              <Link to="/transactions" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontSize: '0.875rem' }}>View All</Link>
+            </div>
+            
+            {recentPayments.length === 0 ? (
+              <div className="empty-state" style={{ flex: 1, minHeight: '150px' }}>
+                <p>No transactions today.</p>
               </div>
             ) : (
-              <div className="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>User</th>
-                      <th>Amount (Coins)</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {payments.map(p => (
-                      <tr key={p._id}>
-                        <td>
-                          <div style={{ fontWeight: 600 }}>{p.user?.name || 'Unknown User'}</div>
-                          <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{p.user?.mobileNumber || p.user?.email}</div>
-                        </td>
-                        <td style={{ fontWeight: 600, color: 'var(--accent-green)' }}>+{p.coinsAmount}</td>
-                        <td style={{ fontSize: '0.875rem' }}>{formatDate(p.createdAt)}</td>
-                        <td><span className={`badge badge-${p.status === 'completed' ? 'active' : 'pending'}`}>{p.status}</span></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="transaction-list">
+                {recentPayments.map(p => (
+                  <div key={p._id} className="transaction-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div className="avatar" style={{ background: 'var(--bg-tertiary)', width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                        {p.user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{p.user?.name || 'Unknown User'}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{formatDate(p.createdAt)}</div>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--accent-green)', fontSize: '1.1rem' }}>+{p.coinsAmount}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Coins</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
