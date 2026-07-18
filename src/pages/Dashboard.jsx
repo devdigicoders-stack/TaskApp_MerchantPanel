@@ -76,7 +76,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right Column: Stats & Recent Tx */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 12 }}>
           <div className="stats-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="stat-card" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(30,30,40,1) 100%)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
               <div className="stat-icon" style={{ background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-primary)' }}>
