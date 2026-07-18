@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { FiDollarSign, FiClock, FiDownload, FiShare2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
@@ -39,6 +39,45 @@ export default function Dashboard() {
     });
   };
 
+  const handleDownloadQR = () => {
+    // QRCodeCanvas renders a real <canvas> element — grab it directly by ID
+    const canvas = document.getElementById('merchant-qr-code');
+    if (!canvas) {
+      toast.error('QR Code not found. Please refresh and try again.');
+      return;
+    }
+
+    try {
+      const pngUrl = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `${qrData?.shopName?.replace(/\s+/g, '_') || 'Merchant'}_QR.png`;
+      downloadLink.href = pngUrl;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      toast.success('QR Code downloaded!');
+    } catch (err) {
+      console.error('Download failed:', err);
+      toast.error('Failed to download QR Code.');
+    }
+  };
+
+  const handleShareQR = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Pay ${qrData?.shopName}`,
+          text: `Scan this QR code to pay ${qrData?.shopName}`,
+          url: `merchant:${qrData?.qrData}`
+        });
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      toast.error('Sharing not supported on this device/browser');
+    }
+  };
+
   if (loading) return <div className="loading-center"><div className="spinner" /></div>;
 
   return (
@@ -58,7 +97,7 @@ export default function Dashboard() {
           <h3 style={{ margin: '0 0 24px 0', color: 'var(--text-primary)', zIndex: 1 }}>Your Payment QR Code</h3>
           {qrData?.qrData ? (
             <div style={{ background: '#fff', padding: 24, borderRadius: 24, marginBottom: 24, boxShadow: '0 10px 40px rgba(99, 102, 241, 0.2)', zIndex: 1 }}>
-              <QRCodeSVG value={`merchant:${qrData.qrData}`} size={220} />
+              <QRCodeCanvas id="merchant-qr-code" value={`merchant:${qrData.qrData}`} size={220} bgColor="#ffffff" fgColor="#000000" />
             </div>
           ) : (
             <p>QR Code not available</p>
@@ -66,10 +105,10 @@ export default function Dashboard() {
           <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '1.1rem', zIndex: 1 }}>Scan to pay <strong>{qrData?.shopName}</strong></p>
           
           <div style={{ display: 'flex', gap: '16px', marginTop: '24px', zIndex: 1 }}>
-            <button className="btn btn-secondary" style={{ borderRadius: '20px' }}>
+            <button className="btn btn-secondary" style={{ borderRadius: '20px' }} onClick={handleDownloadQR}>
               <FiDownload /> Download
             </button>
-            <button className="btn btn-primary" style={{ borderRadius: '20px' }}>
+            <button className="btn btn-primary" style={{ borderRadius: '20px' }} onClick={handleShareQR}>
               <FiShare2 /> Share QR
             </button>
           </div>
