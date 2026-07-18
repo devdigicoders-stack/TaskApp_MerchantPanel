@@ -40,25 +40,104 @@ export default function Dashboard() {
   };
 
   const handleDownloadQR = () => {
-    // QRCodeCanvas renders a real <canvas> element — grab it directly by ID
-    const canvas = document.getElementById('merchant-qr-code');
-    if (!canvas) {
+    const qrCanvas = document.getElementById('merchant-qr-code');
+    if (!qrCanvas) {
       toast.error('QR Code not found. Please refresh and try again.');
       return;
     }
 
     try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      const width = 600;
+      const height = 850;
+      canvas.width = width;
+      canvas.height = height;
+
+      // 1. Background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Top Header (Purple gradient-like solid color)
+      ctx.fillStyle = '#6366f1'; 
+      ctx.fillRect(0, 0, width, 180);
+
+      // 3. App Name / Logo
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 54px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TaskApp', width / 2, 90);
+
+      // 4. Subtitle in header
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.font = '22px sans-serif';
+      ctx.fillText('Merchant Payments', width / 2, 135);
+
+      // 5. Merchant Name
+      ctx.fillStyle = '#1e1e2d';
+      ctx.font = 'bold 40px sans-serif';
+      ctx.fillText(qrData?.shopName || 'Merchant', width / 2, 260);
+
+      // 6. Scan and Pay Text
+      ctx.fillStyle = '#666666';
+      ctx.font = '24px sans-serif';
+      ctx.fillText('Scan & Pay with any UPI App', width / 2, 310);
+
+      // 7. Draw QR Code with Shadow and Rounded Corners
+      const qrSize = 340;
+      const qrX = (width - qrSize) / 2;
+      const qrY = 360;
+      
+      const drawRoundedRect = (x, y, w, h, r) => {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      };
+      
+      // Shadow for QR box
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+      ctx.shadowBlur = 30;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 15;
+      ctx.fillStyle = '#ffffff';
+      drawRoundedRect(qrX - 24, qrY - 24, qrSize + 48, qrSize + 48, 24);
+      ctx.fill();
+      
+      // Reset shadow for QR image
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Draw actual QR
+      ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+      // 8. Footer Area
+      ctx.fillStyle = '#f8f9fa';
+      ctx.fillRect(0, height - 120, width, 120);
+      
+      // Footer text
+      ctx.fillStyle = '#10b981'; // Green accent
+      ctx.font = 'bold 28px sans-serif';
+      ctx.fillText('100% Secure & Fast Payments', width / 2, height - 50);
+
+      // 9. Download the canvas
       const pngUrl = canvas.toDataURL('image/png');
       const downloadLink = document.createElement('a');
-      downloadLink.download = `${qrData?.shopName?.replace(/\s+/g, '_') || 'Merchant'}_QR.png`;
+      downloadLink.download = `${qrData?.shopName?.replace(/\s+/g, '_') || 'Merchant'}_Standee.png`;
       downloadLink.href = pngUrl;
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
-      toast.success('QR Code downloaded!');
+      toast.success('Standee downloaded successfully!');
     } catch (err) {
       console.error('Download failed:', err);
-      toast.error('Failed to download QR Code.');
+      toast.error('Failed to download QR Standee.');
     }
   };
 
