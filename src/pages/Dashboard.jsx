@@ -42,8 +42,8 @@ export default function Dashboard() {
   if (loading) return <div className="loading-center"><div className="spinner" /></div>;
 
   return (
-    <div className="page-header" style={{ padding: '0 20px 40px 20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div className="flex-between align-center" style={{ marginBottom: 32 }}>
+    <div style={{ padding: '0 20px 40px 20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="page-header" style={{ marginBottom: 32 }}>
         <div>
           <h1 className="page-title">Dashboard Overview</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Welcome back to your store!</p>
