@@ -149,14 +149,9 @@ export default function Dashboard() {
 
         // 6. Scan and Pay Text
         ctx.fillStyle = '#444444';
-        ctx.font = 'bold 22px sans-serif';
+        ctx.font = 'bold 30px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Scan and pay with any BHIM UPI app', width / 2, qrY + qrSize + 60);
-
-        // 7. UPI Supported Icons Text (Fallback if we don't have images)
-        ctx.fillStyle = '#555555';
-        ctx.font = 'bold 28px sans-serif';
-        ctx.fillText('GPay | PhonePe | Paytm | UPI', width / 2, qrY + qrSize + 120);
+        ctx.fillText('Scan and pay Task App Coin', width / 2, qrY + qrSize + 80);
 
         // 8. Download the canvas
         const pngUrl = canvas.toDataURL('image/png');
