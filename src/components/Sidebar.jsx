@@ -1,12 +1,13 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { FiPieChart, FiList, FiSettings, FiLogOut } from 'react-icons/fi';
+import { FiPieChart, FiList, FiSettings, FiLogOut, FiGift } from 'react-icons/fi';
 
 const NAV_ITEMS = [
-  { to: '/', icon: <FiPieChart />, label: 'Dashboard', id: 'nav-dashboard' },
-  { to: '/transactions', icon: <FiList />, label: 'Transactions', id: 'nav-transactions' },
-  { to: '/settings', icon: <FiSettings />, label: 'Settings', id: 'nav-settings' },
+  { to: '/',             icon: <FiPieChart />, label: 'Dashboard',   id: 'nav-dashboard'   },
+  { to: '/transactions', icon: <FiList />,     label: 'Transactions', id: 'nav-transactions' },
+  { to: '/redemptions',  icon: <FiGift />,     label: 'Redemptions',  id: 'nav-redemptions'  },
+  { to: '/settings',     icon: <FiSettings />, label: 'Settings',     id: 'nav-settings'     },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {

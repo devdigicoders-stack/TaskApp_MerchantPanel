@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Settings from './pages/Settings';
+import Redemptions from './pages/Redemptions';
 import Sidebar from './components/Sidebar';
 import { FiMenu } from 'react-icons/fi';
 import './index.css';
@@ -41,6 +42,7 @@ function ProtectedLayout() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
+            <Route path="/redemptions" element={<Redemptions />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
